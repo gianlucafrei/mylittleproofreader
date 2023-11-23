@@ -6,6 +6,12 @@ My Little Proofreader is leveraging ChatGPT's advanced language understanding ca
 - **Contextual Error Detection:** Identifies and suggests corrections for errors based on the context of the text, something beyond the reach of standard spellcheckers.
 - **Right-Click Menu Integration:** Easy to use when writing text in any program
 
+
+
+https://github.com/gianlucafrei/mylittleproofreader/assets/20921075/17f49471-32bd-4486-b949-0247c58dbd31
+
+
+
 ## Installation on MacOS
 
 - Ensure you have an active internet connection.
