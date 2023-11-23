@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import openai
 import os
 import argparse
@@ -7,12 +8,15 @@ import sys
 # Create an ArgumentParser object
 parser = argparse.ArgumentParser(description='My little proofreader')
 parser.add_argument('-q', '--quiet', action='store_true', help='Only output corrected version')
-parser.add_argument('-s', '--simplify', action='store_true', help='Simplify sentence')
+parser.add_argument('-s', '--simplify', action='store_true', help='Simplify paragraph')
 parser.add_argument('-n', '--native', action='store_true', help='Write like a native english speaker')
-parser.add_argument('-p', '--proofread', action='store_true', help='Proofread sentence', default=True)
+parser.add_argument('-p', '--proofread', action='store_true', help='Proofread paragraph', default=True)
+parser.add_argument('-i', '--improve', action='store_true', help='Improve paragraph')
+
+
 args = parser.parse_args()
 
-if args.simplify or args.native:
+if args.simplify or args.native or args.improve:
     args.proofread = False
 
 # Set up OpenAI API credentials
@@ -40,6 +44,7 @@ def get_input_text():
 proofread_prompt = "You are a helpful assistant who proofreads text. Just output the corrected text without any errors."
 simplify_prompt = "You are a helpful assistant simplifies text. Your job is to reduce the complexity of sentences but you should not make up any content on your own. Break up long sentences if needed. Just output the corrected text without any errors."
 native_prompt = "You are a helpful assistant who helps a non-native english speaker to write like a native would. Just output the improved text without any errors."
+improve_prompt = "You are a helpful assistant who helps in writing and improves paragraphs that the user writes. But keep it short and concise. Just output the improved text without any errors."
 
 
 def proofread(input_text):
@@ -50,6 +55,8 @@ def proofread(input_text):
         prompt = simplify_prompt
     if args.native:
         prompt = native_prompt
+    if args.improve:
+        prompt = improve_prompt
 
     # Generate the completion using OpenAI API
     response = openai.ChatCompletion.create(
