@@ -12,7 +12,7 @@ parser.add_argument('-s', '--simplify', action='store_true', help='Simplify para
 parser.add_argument('-n', '--native', action='store_true', help='Write like a native english speaker')
 parser.add_argument('-p', '--proofread', action='store_true', help='Proofread paragraph', default=True)
 parser.add_argument('-i', '--improve', action='store_true', help='Improve paragraph')
-
+parser.add_argument('-e', '--evaluate', action='store_true', help='Raw evaluate input')
 
 args = parser.parse_args()
 
@@ -38,13 +38,17 @@ def get_input_text():
     if is_input_available():
         return sys.stdin.read()
     else:
-        return input("Enter text to proofread: ")
+        if args.evaluate:
+            return input("Enter prompt: ")
+        else:
+            return input("Enter text to proofread: ")
 
 
 proofread_prompt = "You are a helpful assistant who proofreads text. Just output the corrected text without any errors."
 simplify_prompt = "You are a helpful assistant simplifies text. Your job is to reduce the complexity of sentences but you should not make up any content on your own. Break up long sentences if needed. Just output the corrected text without any errors."
 native_prompt = "You are a helpful assistant who helps a non-native english speaker to write like a native would. Just output the improved text without any errors."
 improve_prompt = "You are a helpful assistant who helps in writing and improves paragraphs that the user writes. But keep it short and concise. Just output the improved text without any errors."
+evaluate_prompt = ""
 
 
 def proofread(input_text):
@@ -57,6 +61,8 @@ def proofread(input_text):
         prompt = native_prompt
     if args.improve:
         prompt = improve_prompt
+    if args.evaluate:
+        prompt = evaluate_prompt
 
     # Generate the completion using OpenAI API
     response = openai.ChatCompletion.create(
@@ -97,6 +103,10 @@ def highlight_corrections(text_with_errors, proofread_version):
 def output(text_with_errors, proofread_version):
 
     if args.quiet:
+
+        #if args.evaluate:
+        #    print(text_with_errors + "\n\n")
+
         print(proofread_version)
     else:
 
@@ -107,7 +117,8 @@ def output(text_with_errors, proofread_version):
         print("\nCorrected Version:")
         print(output_text)
 
-# Main logic
-text_with_errors = get_input_text()
-proofread_version = proofread(text_with_errors)
-output(text_with_errors, proofread_version)
+# Main Logic
+if __name__ == "__main__":
+    text_with_errors = get_input_text()
+    proofread_version = proofread(text_with_errors)
+    output(text_with_errors, proofread_version)

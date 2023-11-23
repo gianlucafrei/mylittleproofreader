@@ -36,13 +36,14 @@ else
     echo "API key stored successfully in ~/.config/openai.apikey"
 fi
 
+echo "This will need SUDO permissions"
 # Make the proofreader.py script executable
-chmod +x proofreader.py
+sudo cp -R ./ /usr/local/bin/mylittleproofreader
 
 # Check if /usr/local/bin is in the PATH
 if [[ ":$PATH:" == *":/usr/local/bin:"* ]]; then
     # Create a symbolic link to proofreader.py
-    sudo ln -s "$(pwd)/proofreader.py" /usr/local/bin/proofread
+    sudo ln -s "/usr/local/bin/mylittleproofreader/proofreader.py" /usr/local/bin/proofread
     echo "You can now run the proofreader using the command 'proofread'"
 else
     echo "Error: /usr/local/bin is not in the PATH."
@@ -52,8 +53,28 @@ fi
 PYTHON_PATH=$(which python3)
 echo "Python Path: $PYTHON_PATH"
 
-# Install automater workflow "Proofread"
-cp -R macos/Proofread.workflow /Users/$(whoami)/Library/Services
-sed -e "s|PYTHON_PATH|${PYTHON_PATH}|g" macos/Proofread.workflow/Contents/document.wflow > /Users/$(whoami)/Library/Services/Proofread.workflow/Contents/document.wflow
-echo "Installed at /Users/$(whoami)/Library/Services/Proofread.workflow"
-echo "Use with proofread in command line or right-click, then Services, Proofread"
+# Install automater workflows
+install_workflow() {
+    local workflow_name=$1
+
+    # Check if the workflow name is provided
+    if [ -z "$workflow_name" ]; then
+        echo "No workflow name provided."
+        return 1
+    fi
+
+    # Copy the workflow to the user's Library/Services directory
+    cp -R "macos/$workflow_name.workflow" "/Users/$(whoami)/Library/Services"
+
+    # Replace the placeholder with the actual PYTHON_PATH
+    sed -e "s|PYTHON_PATH|${PYTHON_PATH}|g" "macos/$workflow_name.workflow/Contents/document.wflow" > "/Users/$(whoami)/Library/Services/$workflow_name.workflow/Contents/document.wflow"
+
+    echo "Installed at /Users/$(whoami)/Library/Services/$workflow_name.workflow"
+}
+
+install_workflow "Evaluate"
+install_workflow "Improve"
+install_workflow "Proofread"
+install_workflow "Simplify"
+install_workflow "WriteLikeNative"
+echo "Use with $workflow_name in command line or right-click, then Services, $workflow_name"
